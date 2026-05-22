@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto & Forex Prices</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/price.jpeg') }}" type="image/jpeg">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <meta name="theme-color" content="#1a1a1a">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="Live updates on cryptocurrency and forex market prices.">
+  <meta name="keywords" content="crypto prices, forex rates, live market, currency exchange, Bitcoin, USD, Euro">
+  <meta name="author" content="Mohammad TB">
+  <meta property="og:title" content="Crypto & Forex Prices">
+  <meta property="og:description" content="Live updates on cryptocurrency and forex market prices.">
+  <meta property="og:image" content="{{ url_for('static', filename='images/price.jpeg', _external=True) }}">
+  <meta property="og:url" content="https://mohammadtb.ir/crypto-forex">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Mohammad TB">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Crypto & Forex Prices">
+  <meta name="twitter:description" content="Live updates on cryptocurrency and forex market prices.">
+  <meta name="twitter:image" content="{{ url_for('static', filename='images/price.jpeg', _external=True) }}">
+</head>
+
+<body>
+  <nav>
+    <div class="logo">Mohammad TB</div>
+    <ul>
+      <li><a href="/">Home</a></li>
+    </ul>
+  </nav>
+  <div class="container">
+    <h1>Market Prices</h1>
+
+    <section class="section crypto">
+      <h2>💰 Cryptocurrencies</h2>
+      <div class="search-box">
+        <input id="searchCrypto" type="text" placeholder="Search Cryptocurrencies...">
+        <button id="dosearchCrypto">Search</button>
+      </div>
+      <div class="crypto-list">
+        {% for coin in crypto %}
+          <div class="card{% if loop.index > 5 %} hidden{% endif %}">
+            <p class="title">{{ coin.name }}</p>
+            <p class="price">Price: {{ coin.price }}</p>
+          </div>
+        {% endfor %}
+      </div>
+      <button class="toggle-btn" onclick="toggleSection('crypto')">▼ Show More</button>
+    </section>
+
+    <section class="section fiat">
+      <h2>💵 Fiat Currencies</h2>
+      <div class="search-box">
+        <input id="searchFiat" type="text" placeholder="Search Fiat Currencies...">
+        <button id="dosearchFiat">Search</button>
+      </div>
+      <div class="fiat-list">
+        {% for currency in Fiat %}
+          <div class="card{% if loop.index > 5 %} hidden{% endif %}">
+            <p class="title">{{ currency.name }}</p>
+            <p class="price">Price: {{ currency.price }}</p>
+          </div>
+        {% endfor %}
+      </div>
+      <button class="toggle-btn" onclick="toggleSection('fiat')">▼ Show More</button>
+    </section>
+
+    <section class="section commodities">
+      <h2>🏅 Commodities</h2>
+      <div class="search-box">
+        <input id="searchCommodities" type="text" placeholder="Search Commodities...">
+        <button id="dosearchCommodities">Search</button>
+      </div>
+      <div class="commodities-list">
+        {% for commodity in Commodities %}
+          <div class="card{% if loop.index > 5 %} hidden{% endif %}">
+            <p class="title">{{ commodity.symbol }}</p>
+            <p class="price">Price: {{ commodity.price }}</p>
+          </div>
+        {% endfor %}
+      </div>
+      <button class="toggle-btn" onclick="toggleSection('commodities')">▼ Show More</button>
+    </section>
+
+    <section class="section forex">
+      <h2>💱 Forex Rates</h2>
+      <div class="search-box">
+        <input id="searchForex" type="text" placeholder="Search Forex Rates...">
+        <button id="dosearchForex">Search</button>
+      </div>
+      <div class="forex-list">
+        {% for fx in fx %}
+          <div class="card{% if loop.index > 5 %} hidden{% endif %}">
+            <p class="title">{{ fx.currency }}</p>
+            <p class="price">Rate: {{ fx.rate }}</p>
+          </div>
+        {% endfor %}
+      </div>
+      <button class="toggle-btn" onclick="toggleSection('forex')">▼ Show More</button>
+    </section>
+
+    <div class="footer-bottom">
+      <p>© 2025 All rights reserved mohammadtb.ir</p><br>
+      <p>The data provided is sourced from: coingecko.com and brsapi.ir and exchangerate-api.com</p>
+    </div>
+  </div>
+
+  <script>
+    function toggleSection(type) {
+      const section = document.querySelector(`.${type}-list`);
+      const cards = section.querySelectorAll('.card');
+      const button = section.parentElement.querySelector('.toggle-btn');
+
+      const isCollapsed = cards[5].classList.contains('hidden');
+      cards.forEach((card, index) => {
+        if (index >= 5) {
+          card.classList.toggle('hidden', !isCollapsed);
+        }
+      });
+
+      button.textContent = isCollapsed ? '▲ Show Less' : '▼ Show More';
+    }
+
+    function filterCards(sectionClass, searchTerm) {
+      const section = document.querySelector(`.${sectionClass}-list`);
+      const cards = section.querySelectorAll('.card');
+
+      cards.forEach(card => {
+        const title = card.querySelector('.title').textContent.toLowerCase();
+        if (title.includes(searchTerm.toLowerCase())) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    document.querySelectorAll('.search-box').forEach((box, index) => {
+      const input = box.querySelector('input');
+      const button = box.querySelector('button');
+
+      let sectionType;
+      if (index === 0) sectionType = 'crypto';
+      else if (index === 1) sectionType = 'fiat';
+      else if (index === 2) sectionType = 'commodities';
+      else sectionType = 'forex'; 
+      button.addEventListener('click', () => {
+        const term = input.value.trim();
+        if (term === '') {
+          const section = document.querySelector(`.${sectionType}-list`);
+          const cards = section.querySelectorAll('.card');
+          cards.forEach((card, i) => {
+            card.classList.toggle('hidden', i >= 5);
+          });
+        } else {
+          filterCards(sectionType, term);
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
